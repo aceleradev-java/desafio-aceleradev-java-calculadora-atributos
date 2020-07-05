@@ -10,12 +10,12 @@ public class CalculadorDeClasses implements Calculavel {
 
     @Override
     public BigDecimal somar(Object objeto) {
-        return ServicoExtraiNumeros.somaNumerosDaAnotacaoSomar(objeto);
+        return ServicoExtraiNumeros.somarNumerosDaAnotacaoSomar(objeto);
     }
 
     @Override
     public BigDecimal subtrair(Object objeto) {
-        return ServicoExtraiNumeros.somaNumerosDaAnotacaoSubtrair(objeto);
+        return ServicoExtraiNumeros.somarNumerosDaAnotacaoSubtrair(objeto);
     }
 
     @Override

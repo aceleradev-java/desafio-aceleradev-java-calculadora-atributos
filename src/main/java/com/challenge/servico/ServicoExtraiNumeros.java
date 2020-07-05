@@ -4,17 +4,26 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ServicoExtraiNumeros {
 
     private ServicoExtraiNumeros() {}
     
-    public static BigDecimal somaNumerosDaAnotacaoSomar(Object objeto) {
-        List<Field> campos = Arrays.asList(objeto.getClass().getDeclaredFields());
+    public static BigDecimal somarNumerosDaAnotacaoSomar(Object objeto) {
+        return somarNumerosDosCampos(objeto, ServicoValidaCampo::ehCampoSomaValido);
+    }
+    
+    private static BigDecimal somarNumerosDosCampos(Object objeto, Predicate<Field> servicoValidaCampo) {
+        List<Field> campos = pegaTodosOsCampos(objeto);
         return campos.stream()
-            .filter(ServicoValidaCampo::ehCampoSomaValido)
+            .filter(servicoValidaCampo::test)
             .map(campo -> pegaValorDoCampo(campo, objeto))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    private static List<Field> pegaTodosOsCampos(Object objeto) {
+        return Arrays.asList(objeto.getClass().getDeclaredFields());
     }
     
     private static BigDecimal pegaValorDoCampo(Field field, Object objeto) {
@@ -34,11 +43,7 @@ public class ServicoExtraiNumeros {
         return BigDecimal.ZERO;
     }
 
-    public static BigDecimal somaNumerosDaAnotacaoSubtrair(Object objeto) {
-        List<Field> campos = Arrays.asList(objeto.getClass().getDeclaredFields());
-        return campos.stream()
-            .filter(ServicoValidaCampo::ehCampoSubtracaoValido)
-            .map(campo -> pegaValorDoCampo(campo, objeto))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public static BigDecimal somarNumerosDaAnotacaoSubtrair(Object objeto) {
+        return somarNumerosDosCampos(objeto, ServicoValidaCampo::ehCampoSubtracaoValido);
     }
 }

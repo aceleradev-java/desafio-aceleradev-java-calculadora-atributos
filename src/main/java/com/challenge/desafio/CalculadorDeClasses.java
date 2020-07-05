@@ -1,5 +1,6 @@
 package com.challenge.desafio;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -15,37 +16,52 @@ public class CalculadorDeClasses implements Calculavel {
     @Override
     public BigDecimal somar(Object objeto) {
         List<Field> campos = Arrays.asList(objeto.getClass().getDeclaredFields());
-        BigDecimal total = campos.stream()
-                                .filter(campo -> campo.getType().equals(BigDecimal.class) && campo.isAnnotationPresent(Somar.class))
-                                .map( campo -> getValueFromField(campo, objeto))
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return total;
+        return campos.stream()
+            .filter(CalculadorDeClasses::ehCampoSomaValido)
+            .map( campo -> pegaValorDoCampo(campo, objeto))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal getValueFromField(Field field, Object objeto) {
-        BigDecimal value = new BigDecimal(0);
+    private static boolean ehCampoSomaValido(Field campo) {
+        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, Somar.class);
+    }
+    
+    private static boolean ehBigDeciMal(Field campo) {
+        return campo.getType().equals(BigDecimal.class);
+    }
+    
+    private static boolean ehAnotacaoValida(Field campo, Class<? extends Annotation> classe) {
+        return campo.isAnnotationPresent( classe);
+    }
+    
+    private BigDecimal pegaValorDoCampo(Field field, Object objeto) {
         try {
             field.setAccessible(true);
-            value = (BigDecimal) field.get(objeto);
+            return (BigDecimal) field.get(objeto);
         } catch (SecurityException e) {
             System.out.println("Campo não encontrado");
+            e.printStackTrace();
         } catch (IllegalArgumentException e) {
             System.out.println("Argumento inválido");
+            e.printStackTrace();
         } catch (IllegalAccessException e) {
             System.out.println("Você não tem permissão");
+            e.printStackTrace();
         }
-        return value;
+        return BigDecimal.ZERO;
     }
 
     @Override
     public BigDecimal subtrair(Object objeto) {
-        Object obj = objeto;
-        List<java.lang.reflect.Field> campos = Arrays.asList(objeto.getClass().getDeclaredFields());
-        BigDecimal total = campos.stream()
-                                .filter(campo -> campo.getType().equals(BigDecimal.class) && campo.isAnnotationPresent(Subtrair.class))
-                                .map( campo -> getValueFromField(campo, obj))
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return total;
+        List<Field> campos = Arrays.asList(objeto.getClass().getDeclaredFields());
+        return campos.stream()
+            .filter(CalculadorDeClasses::ehCampoSubtracaoValido)
+            .map( campo -> pegaValorDoCampo(campo, objeto))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private static boolean ehCampoSubtracaoValido(Field campo) {
+        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, Subtrair.class);
     }
 
     @Override

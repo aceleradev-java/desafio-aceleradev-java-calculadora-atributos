@@ -8,11 +8,14 @@ import com.challenge.annotation.Somar;
 import com.challenge.annotation.Subtrair;
 
 public class ServicoValidaCampo {
+    
+    public static final Class<? extends Annotation> ANOTACAO_SOMAR = Somar.class;
+    public static final Class<? extends Annotation> ANOTACAO_SUBTRAIR = Subtrair.class;
 
     private ServicoValidaCampo() {}
 
     public static boolean ehCampoSomaValido(Field campo) {
-        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, Somar.class);
+        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, ANOTACAO_SOMAR);
     }
     
     private static boolean ehBigDeciMal(Field campo) {
@@ -24,7 +27,7 @@ public class ServicoValidaCampo {
     }
 
     public static boolean ehCampoSubtracaoValido(Field campo) {
-        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, Subtrair.class);
+        return ehBigDeciMal(campo) && ehAnotacaoValida(campo, ANOTACAO_SUBTRAIR);
     }
 
 }
